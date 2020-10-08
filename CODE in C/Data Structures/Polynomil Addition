@@ -1,0 +1,118 @@
+//Program to read two polynomials and find its sum.
+#include <stdio.h>
+#define Max 100
+typedef struct{
+    float coef;
+    int exp;
+}polynomial;
+ polynomial poli[Max];
+ int input(int *S,int *F,int tr)  //Function to read the polynomials
+    {
+     int i,j;
+     polynomial temp;
+     for(i=*S;i<*S+tr;i++)
+     {
+        printf("Enter the co efficent\t");
+        scanf("%f",&poli[i].coef);
+        printf("Enter the Exponent\t");
+        scanf("%d",&poli[i].exp);
+        *F=*F+1;  
+     }
+    for(i=*S;i<=*F;i++)
+        for(j=i+1;j<=*F;j++)
+            if(poli[i].exp<poli[j].exp){
+                temp=poli[i];
+                poli[i]=poli[j];
+                poli[j]=temp;
+            }
+    return *F+1;
+}
+
+void print(int S,int F)   //Function to print the polynomials
+{
+    int i;
+    for(i=S;i<=F;i++){
+         if(poli[i].exp==0){
+            printf("%.2f",poli[i].coef);
+         }
+         else if(poli[i].coef!=0){
+            printf("%.2f X^%d",poli[i].coef,poli[i].exp);
+        }
+        if(i!=F)
+            printf(" + ");
+    }
+    printf("\n");
+}
+int compare(int ex1 ,int ex2)  //Function to compare exponents
+{
+    if(ex1>ex2)
+        return 1;
+    if(ex2>ex1)
+        return -1;
+    if(ex1==ex2)
+        return 0;
+}
+void sum(int SA,int FA,int SB,int FB,int *S,int *F)  // Function to find sum
+{
+    int l,small1,small2,small;
+    small1=poli[SA].exp;
+    for(l=SA+1;l<=FA;l++)
+        if(small1>poli[l].exp)
+            small1=poli[l].exp;
+    small2=poli[SA].exp;
+    for(l=SB+1;l<=FB;l++)
+        if(small2>poli[l].exp)
+            small2=poli[l].exp;
+    small=small1<small2?small1:small2;
+    for(l=*S;SA<=FA&&SB<=FB;l++){
+        switch(compare(poli[SA].exp,poli[SB].exp)){
+            case 1:poli[l].coef=poli[SA].coef;
+                   poli[l].exp=poli[SA].exp;
+                   SA++;
+                   *F=*F+1;
+                   break;
+            case 0:poli[l].coef=poli[SA].coef+poli[SB].coef;
+                   poli[l].exp=poli[SA].exp;
+                   SA++;
+                   SB++;
+                   *F=*F+1;
+                   break;
+            case -1:poli[l].coef=poli[SB].coef;
+                    poli[l].exp=poli[SB].exp;
+                    SB++;
+                    *F=*F+1;
+                    break;
+        }
+    }
+    if(poli[FA].exp==small&&poli[FB].exp!=small){
+        poli[l].coef=poli[FA].coef;
+        poli[l].exp=poli[FA].exp;
+        *F=*F+1;
+    }
+    else if(poli[FA].exp!=small&&poli[FB].exp==small){
+        poli[l].coef=poli[FB].coef;
+        poli[l].exp=poli[FB].exp;
+        *F=*F+1;
+    }
+
+}
+void main(){ 
+    int startA=0,finishA=-1,startB,finishB,avail=0,startSum,finishSum,numP1,numP2;
+    float temp;
+    printf("Enter the number of terms of First Polinomial\t");
+    scanf("%d",&numP1);
+    startB=input(&startA,&finishA,numP1);
+    finishB=startB-1;
+    printf("Enter the number of terms of Secound Polinomial\t");
+    scanf("%d",&numP2);
+    avail=input(&startB,&finishB,numP2);
+    startSum=avail;
+    finishSum=avail-1;
+    printf("\nFrist polinomial is\n");
+    print(startA,finishA);
+    printf("\nSecound Polinomial is\n");
+    print(startB,finishB);
+    sum(startA,finishA,startB,finishB,&startSum,&finishSum);
+    printf("\nSum Polinomial is\n");
+    print(startSum,finishSum);
+}
